@@ -136,3 +136,200 @@ SPELL_BLANK_SENTENCE,"Nothing is written here yet.","Nada foi escrito aqui ainda
 DEVICE_KBM,"Keyboard & Mouse","Teclado e Mouse"
 DEVICE_KB2,"Keyboard (arrows)","Teclado (setas)"
 DEVICE_PAD,"Controller","Controle"
+GAME_SUBTITLE,Knights of the Grimoire,Cavaleiros do Grimório
+TITLE_PLAY,Open the Grimoire,Abrir o Grimório
+TITLE_SETTINGS,Options,Opções
+TITLE_CREDITS,Colophon,Colofão
+TITLE_QUIT,Close the book,Fechar o livro
+TITLE_FOOT,"Press Enter or (A) on any device to begin · up to four knights, one screen",Pressione Enter ou (A) em qualquer dispositivo · até quatro cavaleiros na mesma tela
+MENU_BACK,Back,Voltar
+KNIGHT,Knight,Cavaleiro
+EMBERS,Embers,Brasas
+HUB_TITLE,The Frontispiece,O Frontispício
+HUB_SUB,Press a button on a free controller to join · write your spells at the lectern,Aperte um botão num controle livre para entrar · escreva seus feitiços no atril
+CHAPTER_1,Chapter I — The Paper Grove,Capítulo I — O Bosque de Papel
+CHAPTER_2,Chapter II — The Wax Catacombs,Capítulo II — As Catacumbas de Cera
+CHAPTER_3,Chapter III — The Ink Sea,Capítulo III — O Mar de Nanquim
+CHAPTER_SHORT_1,Ch. I,Cap. I
+CHAPTER_SHORT_2,Ch. II,Cap. II
+CHAPTER_SHORT_3,Ch. III,Cap. III
+PAGE_SHORT,p. %d,pág. %d
+PAGE_N,Page %d,Página %d
+PAGE_BOSS,The Last Page,A Última Página
+PAGE_REST,The Inkwell's Rest,O Repouso do Tinteiro
+PAGE_SHOP,The Binder's Stall,A Banca do Encadernador
+PAGE_ELITE,An Illuminated Page,Uma Página Iluminada
+PAGE_CLEARED,Page Written,Página Escrita
+CHAPTER_DONE,Chapter Restored,Capítulo Restaurado
+BOSS_BINDER,The Binder,O Encadernador
+BOSS_PHASE2,The Binder tightens its chains!,O Encadernador aperta suas correntes!
+BOSS_ENRAGE,The Binder tears its own pages!,O Encadernador rasga as próprias páginas!
+FX_FROZEN,frozen,congelado
+FX_PERFECT,PERFECT!,PERFEITO!
+FX_LIVING_INK,Living Ink,Tinta Viva
+FX_REKINDLED,Rekindled!,Reacendido!
+GRIMOIRE_SATCHEL,Loose Glyphs,Glifos Soltos
+GRIMOIRE_SATCHEL_EMPTY,Your satchel is empty. Win pages to find glyphs.,Sua bolsa está vazia. Vença páginas para encontrar glifos.
+GRIMOIRE_PAGE,Page,Página
+GRIMOIRE_EMPTY_HINT,"Pick a glyph and write it on the line. Glyphs are read from left to right, like a sentence.","Pegue um glifo e escreva-o na linha. Os glifos são lidos da esquerda para a direita, como uma frase."
+GRIMOIRE_LOCKED,The ink is still wet — finish the page first!,A tinta ainda está fresca — termine a página primeiro!
+HINT_TAKE,take/write,pegar/escrever
+HINT_RETURN,return,devolver
+HINT_PAGE,page,página
+HINT_CLOSE,close,fechar
+NOTE_IMPLICIT_FORM,A clause without a form becomes a Bolt.,Uma oração sem forma vira um Dardo.
+NOTE_DANGLING_LINK,A link with nothing after it is ignored.,Um elo sem nada depois é ignorado.
+NOTE_TOO_DEEP,Too many links: the deepest ones are ignored.,Elos demais: os mais profundos são ignorados.
+NOTE_TOO_MANY_FORMS,At most three forms per clause.,No máximo três formas por oração.
+STAT_COOLDOWN,Cooldown,Recarga
+STAT_DAMAGE,Damage,Dano
+STAT_ESSENCE,Essence,Essência
+STAT_SLOTS,Slots,Espaços
+CHOICE_GLYPH,Choose a Glyph,Escolha um Glifo
+CHOICE_RELIC,Choose a Relic,Escolha uma Relíquia
+CHOICE_PAGE,Add a Line,Acrescente uma Linha
+CHOICE_TOME,Choose your Tome,Escolha seu Tomo
+CHOICE_SUB,for %s,para %s
+RARITY_COMMON,Common,Comum
+RARITY_UNCOMMON,Uncommon,Incomum
+RARITY_RARE,Rare,Rara
+DOOR_GLYPH,A glyph lies ahead,Um glifo adiante
+DOOR_RELIC,A relic lies ahead,Uma relíquia adiante
+DOOR_GOLD,Gold lies ahead,Ouro adiante
+DOOR_HEAL,Rest lies ahead,Descanso adiante
+DOOR_PAGE,A new line lies ahead,Uma nova linha adiante
+DOOR_SHOP,The Binder's stall,A banca do Encadernador
+DOOR_BOSS,Turn the page,Virar a página
+PEDESTAL_GLYPH,Take a glyph,Pegar um glifo
+PEDESTAL_RELIC,Take a relic,Pegar uma relíquia
+PEDESTAL_PAGE,Add a line,Acrescentar linha
+FONT_DRINK,Drink the golden ink,Beber a tinta dourada
+SHOP_HEAL,Bottled light (heals the team),Luz engarrafada (cura o grupo)
+SHOP_POOR,Not enough gold,Ouro insuficiente
+SHOP_SOLD,sold,vendido
+STATION_CANDELABRUM,The Candelabrum,O Candelabro
+STATION_CANDELABRUM_PROMPT,Offer Embers,Oferecer Brasas
+STATION_TOMES,The Lectern,O Atril
+STATION_TOMES_PROMPT,Choose a tome,Escolher um tomo
+TOME_TAG,Starting tome,Tomo inicial
+TOME_EMBER,Tome of Embers,Tomo da Brasa
+TOME_EMBER_DESC,Fire Bolt and Fire Nova. Aggressive and simple.,Dardo de Brasa e Nova de Brasa. Agressivo e simples.
+TOME_WINTER,Tome of Winter,Tomo do Inverno
+TOME_WINTER_DESC,Frost Lance and Frost Rune. Control the page.,Lança de Geada e Runa de Geada. Controle a página.
+TOME_STORM,Tome of the Storm,Tomo da Tormenta
+TOME_STORM_DESC,Storm Chakram and Storm Rain. Chains everywhere.,Chakram de Tempestade e Chuva de Tempestade. Arcos por toda parte.
+TOME_BLANK,The Blank Tome,O Tomo em Branco
+TOME_BLANK_DESC,No spells written — but five loose glyphs to start.,Nenhum feitiço escrito — mas cinco glifos soltos para começar.
+UPGRADE_MAX,max,máx.
+U_VITALITY,Tallow Heart,Coração de Sebo
+U_VITALITY_DESC,+10 maximum health per level.,+10 de vida máxima por nível.
+U_MIGHT,Iron-gall Ink,Tinta Ferrogálica
+U_MIGHT_DESC,+6% damage per level.,+6% de dano por nível.
+U_QUICKINK,Quick-drying Ink,Tinta de Secagem Rápida
+U_QUICKINK_DESC,Spells recharge 5% faster per level.,Feitiços recarregam 5% mais rápido por nível.
+U_FEATHER,Swan Feather,Pena de Cisne
+U_FEATHER_DESC,+1 dash charge.,+1 carga de esquiva.
+U_MARGINS,Wider Margins,Margens Largas
+U_MARGINS_DESC,Every page starts with +1 slot.,Toda página começa com +1 espaço.
+U_RESERVE,Spare Wicks,Pavios Reserva
+U_RESERVE_DESC,+1 shared revive per expedition.,+1 reviver compartilhado por expedição.
+U_LEXICON,The Lexicon,O Léxico
+U_LEXICON_DESC,New glyphs can be found in expeditions.,Novos glifos podem ser encontrados nas expedições.
+U_TOME_BLANK,The Blank Tome,O Tomo em Branco
+U_TOME_BLANK_DESC,Unlocks a starting tome with only loose glyphs.,Desbloqueia um tomo inicial só com glifos soltos.
+R_TALLOW,Tallow Candle,Vela de Sebo
+R_TALLOW_DESC,+20 maximum health.,+20 de vida máxima.
+R_BOOKMARK,Silk Bookmark,Marca-Páginas de Seda
+R_BOOKMARK_DESC,+1 dash charge.,+1 carga de esquiva.
+R_SPECTACLES,Proofreader's Spectacles,Óculos de Revisor
+R_SPECTACLES_DESC,+12% critical chance.,+12% de chance crítica.
+R_INKWELL,Bottomless Inkwell,Tinteiro Sem Fundo
+R_INKWELL_DESC,Spells recharge 12% faster.,Feitiços recarregam 12% mais rápido.
+R_WHETSTONE,Quill Whetstone,Pedra de Amolar Penas
+R_WHETSTONE_DESC,+15% damage.,+15% de dano.
+R_BOOTS,Cover-leather Boots,Botas de Couro de Capa
+R_BOOTS_DESC,+12% movement speed.,+12% de velocidade.
+R_GILDED_NIB,Gilded Nib,Pena Dourada
+R_GILDED_NIB_DESC,Quill hits refill even more ink.,Golpes de pena recarregam ainda mais tinta.
+R_ARMOR,Reinforced Binding,Encadernação Reforçada
+R_ARMOR_DESC,Take 2 less damage from every hit.,Receba 2 de dano a menos de cada golpe.
+R_PURSE,Velvet Purse,Bolsa de Veludo
+R_PURSE_DESC,+35% gold.,+35% de ouro.
+R_LENS,Ruby Lens,Lupa de Rubi
+R_LENS_DESC,Critical hits deal +50% damage.,Críticos causam +50% de dano.
+R_PHOENIX,Phoenix Quill,Pena de Fênix
+R_PHOENIX_DESC,"Once per chapter, rise again at half health.","Uma vez por capítulo, levante-se com metade da vida."
+R_BROKEN_SEAL,Broken Seal,Lacre Quebrado
+R_BROKEN_SEAL_DESC,"After a perfect dodge, your next spell is cast twice.","Após uma esquiva perfeita, seu próximo feitiço é conjurado duas vezes."
+R_COAL,Glowing Coal,Carvão Aceso
+R_COAL_DESC,Burning foes take +25% damage from you.,Inimigos em chamas recebem +25% de dano seu.
+R_AMBER,Amber Drop,Gota de Âmbar
+R_AMBER_DESC,Frozen foes burst into frost when they die.,Inimigos congelados explodem em geada ao morrer.
+R_THUNDER_COLLAR,Thunder Collar,Coleira do Trovão
+R_THUNDER_COLLAR_DESC,Storm arcs jump two more times.,Arcos de Tempestade saltam mais duas vezes.
+R_TWIN_TOME,Twin Tome,Grimório Gêmeo
+R_TWIN_TOME_DESC,"When an ally casts, your cooldowns shorten.","Quando um aliado conjura, suas recargas diminuem."
+R_RIBBON,Friendship Ribbon,Laço de Fita
+R_RIBBON_DESC,+15% damage while an ally is near.,+15% de dano com um aliado por perto.
+R_CANDLE_STUB,Candle Stub,Toco de Vela
+R_CANDLE_STUB_DESC,Heal 8% when a page is written.,Cure 8% ao terminar uma página.
+R_VAMPIRE_QUILL,Vampire Quill,Pena Vampira
+R_VAMPIRE_QUILL_DESC,Quill hits heal 1 health.,Golpes de pena curam 1 de vida.
+R_SHARP_MARGINS,Sharp Margins,Margens Afiadas
+R_SHARP_MARGINS_DESC,Dashing through foes cuts them.,Esquivar através de inimigos os corta.
+R_ECHO_SHELL,Echo Shell,Concha de Eco
+R_ECHO_SHELL_DESC,15% chance for spells to echo.,15% de chance de feitiços ecoarem.
+R_INK_HEART,Ink Heart,Coração de Nanquim
+R_INK_HEART_DESC,+1 shared revive.,+1 reviver compartilhado.
+R_SEALING_WAX,Sealing Wax,Lacre Vermelho
+R_SEALING_WAX_DESC,"When hit, gain a brief shield (every 5 s).","Ao ser atingido, ganhe um escudo breve (a cada 5 s)."
+R_WANDERER_MAP,Wanderer's Map,Mapa do Errante
+R_WANDERER_MAP_DESC,Pages offer three exits instead of two.,Páginas oferecem três saídas em vez de duas.
+PAUSE_TITLE,A Pause in the Ink,Uma Pausa na Tinta
+PAUSE_RESUME,Resume,Continuar
+PAUSE_ABANDON,Abandon the expedition,Abandonar a expedição
+PAUSE_TITLE_SCREEN,Back to the cover,Voltar à capa
+PAUSE_CONTROLS,Controls,Controles
+PAUSE_NO_PLAYERS,No knights have joined yet.,Nenhum cavaleiro entrou ainda.
+ACT_ATTACK,quill,pena
+ACT_SPELL_0,page I,página I
+ACT_SPELL_1,page II,página II
+ACT_SPELL_2,page III,página III
+ACT_DASH,dash,esquiva
+ACT_INTERACT,interact,interagir
+ACT_GRIMOIRE,grimoire,grimório
+SETTINGS_TITLE,Options,Opções
+SETTINGS_SOUND,Sound,Som
+SETTINGS_FEEL,Game feel & comfort,Sensação & conforto
+SETTINGS_DISPLAY,Display & language,Tela & idioma
+SET_MASTER,Master volume,Volume geral
+SET_MUSIC,Music,Música
+SET_SFX,Effects,Efeitos
+SET_SHAKE,Screen shake,Tremor de tela
+SET_HITSTOP,Hit-stop (impact freeze),Hit-stop (congelar no impacto)
+SET_FLASHES,Bright flashes,Clarões
+SET_NUMBERS,Damage numbers,Números de dano
+SET_RUMBLE,Controller vibration,Vibração do controle
+SET_FULLSCREEN,Fullscreen,Tela cheia
+SET_LANGUAGE,Language,Idioma
+CHRONICLE_TITLE,Chronicle of the Expedition,Crônica da Expedição
+CHRONICLE_WON,The Grimoire is whole again.,O Grimório está inteiro outra vez.
+CHRONICLE_LOST,The candles went out… but the book remembers.,As velas se apagaram… mas o livro se lembra.
+CHRONICLE_PAGES,Pages,Páginas
+CHRONICLE_KILLS,Errata erased,Erratas apagadas
+CHRONICLE_TIME,Time,Tempo
+CHRONICLE_DAMAGE,Damage,Dano
+CHRONICLE_CASTS,Spells cast,Feitiços
+CHRONICLE_PERFECT,Perfect dodges,Esquivas perfeitas
+CHRONICLE_REVIVES,Allies rekindled,Aliados reacendidos
+CHRONICLE_SPELL,First page,Primeira página
+CHRONICLE_CONTINUE,Return to the Frontispiece,Voltar ao Frontispício
+CREDITS_TITLE,Colophon,Colofão
+CREDITS_BODY,"Emberquill — a Godot 4 roguelite.
+Models and animations generated in Blender from code; sounds and music synthesised from code.
+Typefaces: Grenze & Grenze Gotisch (Omnibus-Type), IM Fell English (Igino Marini) — SIL Open Font License.
+Inspired by Ember Knights, Noita, Magicka, Mages of Mystralia and Magicraft.","Emberquill — um roguelite em Godot 4.
+Modelos e animações gerados no Blender por código; sons e música sintetizados por código.
+Fontes: Grenze & Grenze Gotisch (Omnibus-Type), IM Fell English (Igino Marini) — SIL Open Font License.
+Inspirado em Ember Knights, Noita, Magicka, Mages of Mystralia e Magicraft."
+DEVICE_LOST,%s disconnected,%s desconectado

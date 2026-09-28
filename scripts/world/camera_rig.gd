@@ -5,7 +5,7 @@ extends Node3D
 
 @export var pitch_deg := 56.0
 @export var fov := 32.0
-@export var min_dist := 21.0
+@export var min_dist := 17.5
 @export var max_dist := 33.0
 @export var follow_speed := 4.5
 

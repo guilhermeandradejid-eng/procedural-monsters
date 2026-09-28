@@ -7,13 +7,13 @@ const OUTLINE := preload("res://shaders/ink_outline.gdshader")
 
 ## Per-chapter mood. paper/ink feed the page shader, light/ambient the scene.
 const MOODS := {
-	"hub": {"light": Color("ffe2b8"), "energy": 1.15, "fill": Color("8fa6d6"), "ambient": Color("6b5448"), "bg": Color("120c0b"),
+	"hub": {"light": Color("ffd9a8"), "energy": 0.95, "fill": Color("8fa6d6"), "ambient": Color("6b5448"), "bg": Color("120c0b"),
 		"paper": Color("efe2c4"), "paper_dark": Color("d9c49a"), "ink": Color("1c1411"), "rubric": Color("9e2b25")},
-	"grove": {"light": Color("ffe0b0"), "energy": 1.2, "fill": Color("9bb8d8"), "ambient": Color("5e5040"), "bg": Color("0f0d09"),
+	"grove": {"light": Color("ffe0b0"), "energy": 1.0, "fill": Color("9bb8d8"), "ambient": Color("5e5040"), "bg": Color("0f0d09"),
 		"paper": Color("efe2c4"), "paper_dark": Color("d6bf92"), "ink": Color("2a2016"), "rubric": Color("7a5a1c")},
-	"catacombs": {"light": Color("ffc89a"), "energy": 1.25, "fill": Color("a07aa0"), "ambient": Color("503838"), "bg": Color("140909"),
+	"catacombs": {"light": Color("ffc89a"), "energy": 0.95, "fill": Color("a07aa0"), "ambient": Color("503838"), "bg": Color("140909"),
 		"paper": Color("e6d2ae"), "paper_dark": Color("c9a878"), "ink": Color("2a1210"), "rubric": Color("a3261e")},
-	"inksea": {"light": Color("dfe8ff"), "energy": 1.2, "fill": Color("5e86c8"), "ambient": Color("38424f"), "bg": Color("070a12"),
+	"inksea": {"light": Color("dfe8ff"), "energy": 0.95, "fill": Color("5e86c8"), "ambient": Color("38424f"), "bg": Color("070a12"),
 		"paper": Color("dfe0d6"), "paper_dark": Color("b9bcae"), "ink": Color("101a2e"), "rubric": Color("27508a")},
 }
 
@@ -29,7 +29,7 @@ static func build(parent: Node3D, mood_id := "hub") -> Dictionary:
 	env.background_color = md.bg
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	env.ambient_light_color = md.ambient
-	env.ambient_light_energy = 0.9
+	env.ambient_light_energy = 0.55
 	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	env.tonemap_exposure = 1.0
 	env.tonemap_white = 6.0
@@ -44,7 +44,7 @@ static func build(parent: Node3D, mood_id := "hub") -> Dictionary:
 	env.ssao_intensity = 1.6
 	env.ssao_power = 1.4
 	env.adjustment_enabled = true
-	env.adjustment_contrast = 1.06
+	env.adjustment_contrast = 1.12
 	env.adjustment_saturation = 1.08
 	var we := WorldEnvironment.new()
 	we.name = "WorldEnvironment"

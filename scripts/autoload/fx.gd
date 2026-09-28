@@ -26,6 +26,8 @@ const KINDS := {
 
 var level: Node3D = null
 var sigils: SigilBank
+## Smaller textures for glyph tiles and reward icons.
+var icons: SigilBank
 var _proc_cache := {}
 var _draw_cache := {}
 var _splats: Array[Node3D] = []
@@ -37,7 +39,13 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	sigils = SigilBank.new()
 	sigils.name = "Sigils"
+	sigils.pool = 48
 	add_child(sigils)
+	icons = SigilBank.new()
+	icons.name = "Icons"
+	icons.tex_size = 128
+	icons.pool = 96
+	add_child(icons)
 	_quad_flat = PlaneMesh.new()
 	_quad_flat.size = Vector2(2, 2)
 

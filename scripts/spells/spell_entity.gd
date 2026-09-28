@@ -42,7 +42,7 @@ func setup(p_cast: SpellCast, p_clause: SpellClause, p_form: String, p_origin: V
 	target = p_target
 	power = p_power
 	exclude = p_exclude.duplicate()
-	vis = SpellVisual.for_clause(clause, form)
+	vis = SpellVisual.for_clause(clause, form, cast.side == "enemies")
 	radius = float(fdef.get("radius", 0.5)) * pow(1.4, clause.mod("grow"))
 	life = float(fdef.get("life", 1.0)) * pow(0.9, clause.mod("swift")) * pow(1.15, clause.mod("grow"))
 	var delays := mini(clause.mod("delay"), 2)
@@ -95,7 +95,11 @@ func _tick(_delta: float) -> void:
 
 
 func speed() -> float:
-	return float(fdef.get("speed", 10.0)) * pow(1.45, clause.mod("swift")) * pow(0.85, clause.mod("grow")) * pow(0.9, clause.mod("heavy")) * (1.6 if clause.mod("delay") > 0 else 1.0)
+	var s := float(fdef.get("speed", 10.0)) * pow(1.45, clause.mod("swift")) * pow(0.85, clause.mod("grow")) * pow(0.9, clause.mod("heavy")) * (1.6 if clause.mod("delay") > 0 else 1.0)
+	# Hostile spells travel slower so they can be read and dodged.
+	if cast.side == "enemies":
+		s *= 0.42
+	return s
 
 
 func base_damage() -> float:
@@ -128,6 +132,8 @@ func deal(t: Node3D, mult := 1.0, knock_dir := Vector3.ZERO) -> Hit:
 	h.potency = clause.potency()
 	h.profile = cast.profile
 	h.clause = clause
+	if cast.side == "players":
+		h.amount *= Relics.damage_mult(cast.profile, t)
 	if cast.rng.randf() < cast.crit_chance(clause):
 		h.crit = true
 		h.amount *= cast.crit_mult()

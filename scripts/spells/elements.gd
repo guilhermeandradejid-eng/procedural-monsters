@@ -25,11 +25,15 @@ static func _apply_base(base: String, h: Hit, t: Node3D, ent: SpellEntity, share
 		"ember":
 			st.add_burn(3.5 * pot * (ent.cast.might() if ent else 1.0))
 		"frost":
-			if st.add_chill(1, bool(t.get("is_boss")), pot):
+			# Knights hit by hostile frost freeze only briefly (treated like bosses).
+			if st.add_chill(1, bool(t.get("is_boss")) or t is Player, pot):
 				SpellFx.freeze_burst(t)
 		"storm":
 			if not h.no_proc:
-				chain(h, t, ent, 2 if pot < 1.4 else 3, 0.4, "storm")
+				var jumps := 2 if pot < 1.4 else 3
+				if h.profile and h.profile.relics.has("thunder_collar"):
+					jumps += 2
+				chain(h, t, ent, jumps, 0.4, "storm")
 		"void":
 			st.add_mark(4.0)
 			if not t.get("is_boss"):

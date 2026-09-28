@@ -198,6 +198,8 @@ func _make_input(key: String) -> PlayerInput:
 func _process(delta: float) -> void:
 	for key in bound:
 		var input: PlayerInput = bound[key]
+		if input.virtual:
+			continue
 		match input.kind:
 			PlayerInput.Kind.KBM:
 				_poll_kbm(input)

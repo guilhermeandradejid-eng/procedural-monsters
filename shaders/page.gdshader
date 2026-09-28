@@ -66,7 +66,7 @@ void fragment() {
 	float burn = 1.0 - smoothstep(0.0, 1.8, edge_dist - deck * 0.5);
 	col = mix(col, paper_dark.rgb * 0.55, burn * edge_burn);
 	col = mix(col, vec3(0.3, 0.2, 0.14), (1.0 - smoothstep(0.0, 0.25, edge_dist - deck * 0.5)) * 0.6);
-	ALBEDO = col;
+	ALBEDO = col * 0.9;
 	ROUGHNESS = 1.0;
 	SPECULAR = 0.0;
 }

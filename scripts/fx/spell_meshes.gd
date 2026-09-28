@@ -123,7 +123,7 @@ static func chakram(blades: int) -> ArrayMesh:
 		var p1 := Vector3(cos(a + 0.55), 0, sin(a + 0.55)) * 1.05
 		var p2 := Vector3(cos(a + 0.7), 0, sin(a + 0.7)) * 0.6
 		for s in [1.0, -1.0]:
-			var up := Vector3.UP * 0.04 * s
+			var up: Vector3 = Vector3.UP * 0.04 * s
 			st.add_vertex(p0 + up)
 			st.add_vertex(p1)
 			st.add_vertex(p2 + up)

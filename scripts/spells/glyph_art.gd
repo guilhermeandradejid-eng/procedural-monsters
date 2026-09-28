@@ -301,6 +301,48 @@ static func _build(id: String) -> Array:
 			s.append(_circle(Vector2(0.14, 0.5), 0.06))
 			s.append(_l(Vector2(0.24, 0.5), Vector2(0.86, 0.5)))
 			s.append_array(_head(Vector2(0.9, 0.5), Vector2(0.24, 0.5), 0.14))
+		# ---------------- reward icons (doors, pedestals, HUD)
+		"reward_glyph":
+			s.append(_curve([Vector2(0.72, 0.1), Vector2(0.5, 0.35), Vector2(0.34, 0.6), Vector2(0.26, 0.78)], 8))
+			s.append(_curve([Vector2(0.72, 0.1), Vector2(0.62, 0.3), Vector2(0.44, 0.52), Vector2(0.28, 0.74)], 8))
+			s.append(_l(Vector2(0.26, 0.78), Vector2(0.2, 0.9)))
+			s.append(_curve([Vector2(0.14, 0.9), Vector2(0.4, 0.84), Vector2(0.6, 0.92), Vector2(0.86, 0.86)], 6))
+		"reward_relic":
+			s.append(_poly([Vector2(0.5, 0.14), Vector2(0.78, 0.4), Vector2(0.5, 0.88), Vector2(0.22, 0.4)], true))
+			s.append(_l(Vector2(0.22, 0.4), Vector2(0.78, 0.4)))
+			s.append(_poly([Vector2(0.36, 0.4), Vector2(0.5, 0.14), Vector2(0.64, 0.4), Vector2(0.5, 0.88)], true))
+		"reward_gold":
+			for i in 3:
+				s.append(_ellipse(Vector2(0.44 + i * 0.05, 0.72 - i * 0.16), 0.24, 0.08))
+			s.append(_ellipse(Vector2(0.62, 0.34), 0.16, 0.16))
+			s.append(_l(Vector2(0.62, 0.26), Vector2(0.62, 0.42)))
+		"reward_heal":
+			s.append(_poly([Vector2(0.38, 0.9), Vector2(0.38, 0.5), Vector2(0.62, 0.5), Vector2(0.62, 0.9)], true))
+			s.append(_curve([Vector2(0.5, 0.44), Vector2(0.4, 0.3), Vector2(0.5, 0.1), Vector2(0.6, 0.3)], 6, true))
+			s.append(_l(Vector2(0.28, 0.9), Vector2(0.72, 0.9)))
+		"reward_page":
+			s.append(_poly([Vector2(0.26, 0.1), Vector2(0.6, 0.1), Vector2(0.76, 0.26), Vector2(0.76, 0.9), Vector2(0.26, 0.9)], true))
+			s.append(_poly([Vector2(0.6, 0.1), Vector2(0.6, 0.26), Vector2(0.76, 0.26)]))
+			s.append(_l(Vector2(0.51, 0.42), Vector2(0.51, 0.74)))
+			s.append(_l(Vector2(0.35, 0.58), Vector2(0.67, 0.58)))
+		"reward_shop":
+			s.append(_curve([Vector2(0.3, 0.42), Vector2(0.24, 0.66), Vector2(0.3, 0.88), Vector2(0.7, 0.88), Vector2(0.76, 0.66), Vector2(0.7, 0.42)], 6))
+			s.append(_l(Vector2(0.3, 0.42), Vector2(0.7, 0.42)))
+			s.append(_curve([Vector2(0.38, 0.42), Vector2(0.44, 0.2), Vector2(0.56, 0.2), Vector2(0.62, 0.42)], 6))
+			s.append(_circle(Vector2(0.5, 0.64), 0.07))
+		"reward_elite":
+			s.append(_arc(Vector2(0.5, 0.5), 0.25, 150.0, 390.0, 22))
+			s.append(_poly([Vector2(0.38, 0.72), Vector2(0.4, 0.86), Vector2(0.6, 0.86), Vector2(0.62, 0.72)]))
+			s.append(_circle(Vector2(0.41, 0.5), 0.05))
+			s.append(_circle(Vector2(0.59, 0.5), 0.05))
+			s.append(_poly([Vector2(0.3, 0.3), Vector2(0.36, 0.1), Vector2(0.44, 0.24), Vector2(0.5, 0.06), Vector2(0.56, 0.24), Vector2(0.64, 0.1), Vector2(0.7, 0.3)]))
+		"reward_boss":
+			s.append(_poly([Vector2(0.14, 0.2), Vector2(0.5, 0.28), Vector2(0.86, 0.2), Vector2(0.86, 0.82), Vector2(0.5, 0.9), Vector2(0.14, 0.82)], true))
+			s.append(_l(Vector2(0.5, 0.28), Vector2(0.5, 0.9)))
+			s.append(_l(Vector2(0.14, 0.4), Vector2(0.86, 0.66)))
+			s.append(_l(Vector2(0.14, 0.66), Vector2(0.86, 0.4)))
+		"reward_ember":
+			s.append(_curve([Vector2(0.5, 0.9), Vector2(0.27, 0.72), Vector2(0.31, 0.46), Vector2(0.44, 0.3), Vector2(0.45, 0.08), Vector2(0.63, 0.3), Vector2(0.73, 0.52), Vector2(0.7, 0.74)], 7, true))
 		_:
 			s.append(_circle(C, 0.3))
 			s.append(_l(Vector2(0.4, 0.4), Vector2(0.6, 0.6)))

@@ -21,6 +21,8 @@ var stick_aim := Vector2.ZERO
 var nav_stick := Vector2.ZERO
 var mouse_screen := Vector2.ZERO
 var last_mouse_move_ms := 0
+## Driven by code (bots/tests): the device is never polled.
+var virtual := false
 
 var _held := {}
 var _pressed_at := {}
@@ -35,7 +37,7 @@ func _init(p_kind: Kind = Kind.KBM, p_pad := -1) -> void:
 
 
 func uses_mouse() -> bool:
-	return kind == Kind.KBM
+	return kind == Kind.KBM and not virtual
 
 
 func device_key() -> String:

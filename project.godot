@@ -20,10 +20,12 @@ config/icon="res://icon.svg"
 [autoload]
 
 Game="*res://scripts/autoload/game.gd"
+Events="*res://scripts/autoload/events.gd"
 Devices="*res://scripts/autoload/devices.gd"
 Audio="*res://scripts/autoload/audio.gd"
 Juice="*res://scripts/autoload/juice.gd"
 Fx="*res://scripts/autoload/fx.gd"
+Relics="*res://scripts/autoload/relics.gd"
 
 [display]
 

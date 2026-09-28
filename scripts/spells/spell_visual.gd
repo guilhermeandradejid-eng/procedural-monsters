@@ -31,14 +31,22 @@ var motes: Array[String] = []
 var mote_rate := 1.0
 var ghost := false
 var jagged := false
+var hostile := false
 
 
-static func for_clause(c: SpellClause, p_form: String) -> SpellVisual:
-	var key := "%d|%s|%s|%s" % [c.seed, c.element, p_form, str(c.mods)]
+static func for_clause(c: SpellClause, p_form: String, p_hostile := false) -> SpellVisual:
+	var key := "%d|%s|%s|%s|%s" % [c.seed, c.element, p_form, str(c.mods), p_hostile]
 	if _cache.has(key):
 		return _cache[key]
 	var v := SpellVisual.new()
 	v._build(c, p_form, hash(key))
+	if p_hostile:
+		v.hostile = true
+		# Hostile magic is written in blotted ink with a warning-red rim.
+		v.dark = Color("140d12")
+		v.rim = Color("ff5a36")
+		v.main = v.main.lerp(Color("2a1a2a"), 0.35)
+		v.glow *= 0.85
 	_cache[key] = v
 	if _cache.size() > 512:
 		_cache.clear()
