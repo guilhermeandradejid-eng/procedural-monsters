@@ -1,0 +1,12 @@
+# Godot 4
+.godot/
+/android/
+*.tmp
+# Python / tooling
+__pycache__/
+*.pyc
+tools/blender/out/
+tools/audio/out/
+# OS
+.DS_Store
+Thumbs.db
