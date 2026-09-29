@@ -35,7 +35,7 @@ func _think(delta: float) -> void:
 				state = "windup"
 				timer = 0.7
 				dive_dir = to.normalized()
-				lock_anim("attack", 1.0, 0.08)
+				lock_anim("attack", 1.32, 0.08)
 				telegraph_line(global_position, dive_dir, 9.5, 0.7, 0.7)
 				Audio.play("moth_screech", global_position, -6.0, randf_range(0.95, 1.1))
 		"windup":

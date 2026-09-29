@@ -33,7 +33,7 @@ def reset():
     bpy.ops.wm.read_factory_settings(use_empty=True)
     scn = bpy.context.scene
     scn.render.fps = FPS
-    scn.frame_start = 1
+    scn.frame_start = 0
     return scn
 
 
@@ -305,24 +305,48 @@ def rigid_parts(parts, arm, name):
 # ---------------------------------------------------------------------------
 
 def _frame(t):
-    return 1 + round(t * FPS)
+    # Frame 0 = time 0 in the exported clip (starting at 1 delays every clip by a frame).
+    return round(t * FPS)
 
 
-def animate(arm, name, keys, interp="BEZIER", cyclic=False):
-    """keys: list of (time_seconds, {bone: {"rot": (x,y,z) deg, "loc": (x,y,z), "scale": (x,y,z)}}).
-    Bones absent from a key return to rest. The action is stored on an NLA track so the
-    glTF exporter picks every clip."""
+def animate(arm, name, keys, interp="BEZIER", cyclic=False, lag=None, springs=None, layers=None):
+    """keys: list of (time_seconds, pose[, ease]) with pose = {bone: {"rot": (x,y,z) deg,
+    "loc": (x,y,z), "scale": (x,y,z)}}. Bones absent from a key return to rest.
+    Runs through motion.Clip, so keys get per-segment easing ("inout" by default,
+    "linear" for interp="LINEAR"), optional per-bone lag (overlap), springs
+    (follow-through) and additive layers, and is baked frame by frame."""
+    import motion as M
+    clip = M.Clip(name, keys[-1][0])
+    default = "linear" if interp == "LINEAR" else "inout"
+    for k in keys:
+        clip.key(k[0], k[1], k[2] if len(k) > 2 else default)
+    if lag:
+        clip.lag.update(lag)
+    if springs:
+        clip.springs.update(springs)
+    if layers:
+        clip.layers.extend(layers)
+    return bake_clip(arm, clip)
+
+
+def bake_clip(arm, clip):
+    """Bake a motion.Clip frame by frame (LINEAR keys) onto its own NLA track.
+    Loops get a closing frame identical to the first so the wrap is seamless."""
+    frames = clip.bake()
+    if clip.loop:
+        frames = frames + [frames[0]]
     if arm.animation_data is None:
         arm.animation_data_create()
-    act = bpy.data.actions.new(name)
+    act = bpy.data.actions.new(clip.name)
     act.use_fake_user = True
     arm.animation_data.action = act
-    used = set()
-    for _, pose in keys:
-        used.update(pose.keys())
-    for t, pose in keys:
-        f = _frame(t)
-        for bn in used:
+    bones = set()
+    for p in frames:
+        bones.update(p.keys())
+    bones = [b for b in bones if b in arm.pose.bones]
+    for i, pose in enumerate(frames):
+        f = i
+        for bn in bones:
             pb = arm.pose.bones[bn]
             d = pose.get(bn, {})
             pb.rotation_euler = [math.radians(a) for a in d.get("rot", (0, 0, 0))]
@@ -331,10 +355,10 @@ def animate(arm, name, keys, interp="BEZIER", cyclic=False):
             pb.keyframe_insert("rotation_euler", frame=f)
             pb.keyframe_insert("location", frame=f)
             pb.keyframe_insert("scale", frame=f)
-    _set_interpolation(act, interp)
+    _set_interpolation(act, "LINEAR")
     track = arm.animation_data.nla_tracks.new()
-    track.name = name
-    track.strips.new(name, _frame(keys[0][0]), act)
+    track.name = clip.name
+    track.strips.new(clip.name, 0, act)
     track.mute = True
     arm.animation_data.action = None
     for pb in arm.pose.bones:

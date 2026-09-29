@@ -34,6 +34,7 @@ var desired := Vector3.ZERO
 var face_dir := Vector3(0, 0, 1)
 var model: Node3D
 var anim: AnimationPlayer
+var rig: ProceduralRig
 var _anim_name := ""
 var _anim_lock := 0.0
 var _think_timer := 0.0
@@ -76,6 +77,11 @@ func _ready() -> void:
 		pivot.scale = Vector3.ONE * 1.15
 		_elite_aura()
 	anim = Toon.find_anim_player(model)
+	var skel := Toon.find_skeleton(model)
+	if skel and kind in ["brute", "binder", "scribbler"]:
+		rig = ProceduralRig.new()
+		rig.lean_bone = "chest" if kind == "brute" else ("spine" if kind == "binder" else "body")
+		skel.add_child(rig)
 	for n in ["idle", "move"]:
 		if anim and anim.has_animation(n):
 			anim.get_animation(n).loop_mode = Animation.LOOP_LINEAR
@@ -140,6 +146,9 @@ func _physics_process(delta: float) -> void:
 	if dead:
 		return
 	tick_actor(delta)
+	if rig:
+		rig.velocity = Combat.flat(velocity)
+		rig.facing_yaw = pivot.rotation.y
 	if dead or not active:
 		return
 	_anim_lock = maxf(0.0, _anim_lock - delta)
@@ -195,6 +204,8 @@ func face(dir: Vector3, delta: float, rate := 10.0) -> void:
 		return
 	face_dir = face_dir.slerp(d.normalized(), 1.0 - exp(-delta * rate)).normalized()
 	pivot.rotation.y = atan2(face_dir.x, face_dir.z)
+	if rig:
+		rig.want_yaw = atan2(d.x, d.z)
 
 
 func dir_to_target() -> Vector3:

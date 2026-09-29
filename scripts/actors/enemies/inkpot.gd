@@ -28,12 +28,19 @@ func _think(delta: float) -> void:
 					_fire(target.global_position + off))
 
 
+## The pot squashes down (anticipation) and the bomb leaves on the pop, 0.3 s in.
+const POP := 0.3
+
+
 func _fire(at: Vector3) -> void:
 	lock_anim("attack", 0.7, 0.05)
 	var landing := Combat.flat(at)
-	telegraph_circle(landing, 1.7, FLIGHT)
-	var shot := EnemyShot.lob(self, global_position + Vector3.UP * 1.0, landing, FLIGHT, damage, 1.7)
-	shot.on_land = func(p: Vector3):
-		InkPuddle.spawn(p, 1.8, 4.0)
-	Level.current.add_spell(shot)
-	Audio.play("lob", global_position, -6.0)
+	telegraph_circle(landing, 1.7, FLIGHT + POP)
+	get_tree().create_timer(POP, false).timeout.connect(func():
+		if not is_instance_valid(self) or dead or Level.current == null:
+			return
+		var shot := EnemyShot.lob(self, global_position + Vector3.UP * 1.0, landing, FLIGHT, damage, 1.7)
+		shot.on_land = func(p: Vector3):
+			InkPuddle.spawn(p, 1.8, 4.0)
+		Level.current.add_spell(shot)
+		Audio.play("lob", global_position, -6.0))

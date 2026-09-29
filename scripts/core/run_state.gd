@@ -2,7 +2,9 @@ class_name RunState
 extends RefCounted
 ## State of one expedition through the Grimoire.
 
-const CHAPTERS := 3
+## MVP scope: a single chapter (the Grove) ending in the Binder fight.
+## The data for Catacombs and Ink Sea stays so more chapters can be re-enabled.
+const CHAPTERS := 1
 const PAGES_PER_CHAPTER := 6  # combat/special pages before the boss page
 
 var seed := 0

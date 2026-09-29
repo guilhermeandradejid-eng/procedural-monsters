@@ -74,7 +74,27 @@ func _ready() -> void:
 				ap.pause()
 		i += 1
 	var frames := int(args.get("frames", "12"))
+	# --rigs=vz:yawrate,... drives a ProceduralRig per model with synthetic motion
+	# (forward speed ramping up to vz m/s while turning at yawrate rad/s).
+	var rigs: Array = []
+	if args.has("rigs"):
+		var specs: PackedStringArray = String(args.rigs).split(",")
+		var k := 0
+		for child in get_children():
+			if child is Node3D and Toon.find_skeleton(child) != null:
+				var rg := ProceduralRig.new()
+				Toon.find_skeleton(child).add_child(rg)
+				var sp := specs[mini(k, specs.size() - 1)].split(":")
+				rigs.append([rg, float(sp[0]), float(sp[1]) if sp.size() > 1 else 0.0, child])
+				k += 1
 	for f in frames:
+		for entry in rigs:
+			var rg: ProceduralRig = entry[0]
+			var ramp := clampf(float(f) / frames * 1.6, 0.0, 1.0)
+			var ryaw: float = (entry[3] as Node3D).rotation.y + float(entry[2]) * f / 60.0
+			rg.facing_yaw = ryaw
+			rg.want_yaw = ryaw + float(entry[2]) * 0.3
+			rg.velocity = Basis(Vector3.UP, ryaw) * Vector3(0, 0, float(entry[1]) * ramp)
 		await get_tree().process_frame
 	await RenderingServer.frame_post_draw
 	var img := get_viewport().get_texture().get_image()

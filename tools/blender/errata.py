@@ -6,6 +6,7 @@ Paper Moth (origami flyer), Inkpot (mortar) and the boss, the Binder."""
 import math
 
 import lib as L
+import motion as M
 
 
 def P(base=None, **over):
@@ -71,26 +72,61 @@ def build_blot(out, pv):
     parts.append((scrap, "body"))
     L.rigid_parts(parts, arm, "Blot")
     A = L.animate
-    A(arm, "idle", [(0.0, {"body": {}}), (0.5, {"body": {"scale": (1.06, 0.93, 1.06)}}), (1.0, {"body": {}})])
+    SQ = M.squash
+
+    def jiggle(t0, amp, freq=9.0, decay=7.0):
+        """Decaying wobble after an impact (secondary action)."""
+        def fn(t, pose):
+            if t < t0:
+                return
+            k = amp * math.exp(-(t - t0) * decay) * math.sin((t - t0) * freq * 2 * math.pi)
+            M.mul_scale(pose, "body", SQ(1.0 + k))
+        return fn
+
+    def tremble(t0, t1, amp):
+        def fn(t, pose):
+            if t0 <= t <= t1:
+                M.add_rot(pose, "body", 0, 0, amp * math.sin(t * 70.0))
+        return fn
+
+    A(arm, "idle", [
+        (0.0, {"body": {"scale": SQ(1.0)}}),
+        (0.5, {"body": {"scale": SQ(0.9), "rot": (0, 0, 3)}}, "inout"),
+        (1.0, {"body": {"scale": SQ(1.0)}}, "inout"),
+    ])
+    # Hop: contact squash -> launch stretch (tilted into the jump) -> round apex ->
+    # falling stretch -> splat. Loops on the contact pose.
+    land = {"body": {"scale": SQ(0.72), "rot": (-6, 0, 0)}}
     A(arm, "move", [
-        (0.0, {"body": {"scale": (1.2, 0.75, 1.2)}}),
-        (0.08, {"body": {"scale": (0.85, 1.25, 0.85), "loc": (0, 0.2, 0)}}),
-        (0.22, {"body": {"scale": (0.96, 1.08, 0.96), "loc": (0, 0.42, 0)}}),
-        (0.38, {"body": {"scale": (0.9, 1.15, 0.9), "loc": (0, 0.14, 0)}}),
-        (0.46, {"body": {"scale": (1.2, 0.75, 1.2)}}),
+        (0.0, land),
+        (0.07, {"body": {"scale": SQ(1.34), "loc": (0, 0.12, 0.02), "rot": (16, 0, 0)}}, "snap"),
+        (0.2, {"body": {"scale": SQ(1.02), "loc": (0, 0.42, 0.03), "rot": (4, 0, 0)}}, "out"),
+        (0.34, {"body": {"scale": SQ(1.22), "loc": (0, 0.14, 0.02), "rot": (-10, 0, 0)}}, "in"),
+        (0.39, {"body": {"scale": SQ(0.66), "rot": (-8, 0, 0)}}, "in"),
+        (0.46, land, "out"),
     ])
+    # Bite: shivering coil (anticipation, 0.4 s = the AI windup), whip-fast lunge,
+    # chomp squash, rebound overshoot, settle.
     A(arm, "attack", [
-        (0.0, {"body": {"rot": (-18, 0, 0), "scale": (1.15, 0.85, 1.15)}}),
-        (0.32, {"body": {"rot": (-24, 0, 0), "scale": (1.22, 0.78, 1.22)}}),
-        (0.42, {"body": {"rot": (28, 0, 0), "scale": (0.82, 1.25, 0.82), "loc": (0, 0.12, 0)}}),
-        (0.55, {"body": {"rot": (12, 0, 0), "scale": (1.2, 0.84, 1.2)}}),
-        (0.75, {"body": {}}),
+        (0.0, {"body": {"scale": SQ(1.0)}}),
+        (0.12, {"body": {"rot": (-16, 0, 0), "scale": SQ(0.82), "loc": (0, 0, -0.04)}}, "out"),
+        (0.38, {"body": {"rot": (-26, 0, 0), "scale": SQ(0.7), "loc": (0, 0, -0.07)}}, "inout"),
+        (0.44, {"body": {"rot": (32, 0, 0), "scale": SQ(1.42), "loc": (0, 0.14, 0.18)}}, "snap"),
+        (0.52, {"body": {"rot": (16, 0, 0), "scale": SQ(0.72), "loc": (0, 0, 0.14)}}, "in"),
+        (0.64, {"body": {"rot": (-6, 0, 0), "scale": SQ(1.12), "loc": (0, 0.02, 0.06)}}, "out"),
+        (0.8, {"body": {"scale": SQ(1.0)}}, "inout"),
+    ], layers=[tremble(0.12, 0.38, 3.5), jiggle(0.52, 0.06)])
+    A(arm, "hit", [
+        (0.0, {"body": {"scale": SQ(0.62), "rot": (-14, 0, 0)}}),
+        (0.08, {"body": {"scale": SQ(1.25), "rot": (6, 0, 0)}}, "out"),
+        (0.18, {"body": {"scale": SQ(0.9)}}, "inout"),
+        (0.3, {"body": {"scale": SQ(1.0)}}, "inout"),
     ])
-    A(arm, "hit", [(0.0, {"body": {"scale": (1.3, 0.7, 1.3)}}), (0.2, {"body": {}})])
     A(arm, "death", [
-        (0.0, {"body": {}}),
-        (0.12, {"body": {"scale": (0.8, 1.3, 0.8), "loc": (0, 0.1, 0)}}),
-        (0.45, {"body": {"scale": (1.9, 0.06, 1.9)}}),
+        (0.0, {"body": {"scale": SQ(1.0)}}),
+        (0.1, {"body": {"scale": SQ(1.4), "loc": (0, 0.14, 0)}}, "out"),
+        (0.26, {"body": {"scale": (1.9, 0.07, 1.9)}}, "in"),
+        (0.5, {"body": {"scale": (2.0, 0.05, 2.0)}}, "out"),
     ])
     if pv:
         L.preview(pv + "/blot.png", target=(0, 0, 0.3), dist=2.2)
@@ -143,29 +179,51 @@ def build_scribbler(out, pv):
         parts.append((ob, "arm.R"))
     L.rigid_parts(parts, arm, "Scribbler")
     A = L.animate
+    lag = {"head": 0.1, "arm.L": 0.14, "arm.R": 0.12}
+    arms_rest = {"arm.L": {"rot": (0, 0, 10)}, "arm.R": {"rot": (10, 0, -10)}}
+
+    def drift(period, amp=4.0):
+        def fn(t, pose):
+            w = 2 * math.pi * t / period
+            M.add_rot(pose, "body", 0, amp * math.sin(w), amp * 0.5 * math.sin(2 * w))
+            M.add_rot(pose, "arm.L", 0, 0, 5 * math.sin(w + 1.0))
+            M.add_rot(pose, "arm.R", 0, 0, -5 * math.sin(w + 1.6))
+        return fn
     A(arm, "idle", [
-        (0.0, {"root": {"loc": (0, 0.0, 0)}, "arm.L": {"rot": (0, 0, 10)}, "arm.R": {"rot": (10, 0, -10)}}),
-        (0.9, {"root": {"loc": (0, 0.08, 0)}, "body": {"rot": (3, 0, 2)}, "head": {"rot": (-6, 0, -3)}, "arm.L": {"rot": (8, 0, 16)}, "arm.R": {"rot": (14, 0, -14)}}),
-        (1.8, {"root": {"loc": (0, 0.0, 0)}, "arm.L": {"rot": (0, 0, 10)}, "arm.R": {"rot": (10, 0, -10)}}),
-    ])
+        (0.0, P(arms_rest, root={"loc": (0, 0.0, 0)})),
+        (0.9, P(arms_rest, root={"loc": (0, 0.09, 0)}, body={"rot": (3, 0, 2)}, head={"rot": (-6, 0, -3)}), "inout"),
+        (1.8, P(arms_rest, root={"loc": (0, 0.0, 0)}), "inout"),
+    ], lag=lag, layers=[drift(1.8)])
+    glide = dict(body={"rot": (18, 0, 0)}, head={"rot": (-12, 0, 0)}, arm__L={"rot": (-36, 0, 24)}, arm__R={"rot": (-30, 0, -22)})
     A(arm, "move", [
-        (0.0, {"root": {"loc": (0, 0.02, 0)}, "body": {"rot": (16, 0, 0)}, "head": {"rot": (-10, 0, 0)}, "arm.L": {"rot": (-30, 0, 20)}, "arm.R": {"rot": (-30, 0, -20)}}),
-        (0.4, {"root": {"loc": (0, 0.1, 0)}, "body": {"rot": (20, 0, 0)}, "head": {"rot": (-12, 0, 0)}, "arm.L": {"rot": (-40, 0, 26)}, "arm.R": {"rot": (-40, 0, -26)}}),
-        (0.8, {"root": {"loc": (0, 0.02, 0)}, "body": {"rot": (16, 0, 0)}, "head": {"rot": (-10, 0, 0)}, "arm.L": {"rot": (-30, 0, 20)}, "arm.R": {"rot": (-30, 0, -20)}}),
-    ])
+        (0.0, P(None, root={"loc": (0, 0.03, 0)}, **glide)),
+        (0.4, P(None, root={"loc": (0, 0.11, 0)}, body={"rot": (21, 0, 0)}, head={"rot": (-13, 0, 0)}, arm__L={"rot": (-44, 0, 28)}, arm__R={"rot": (-40, 0, -26)}), "inout"),
+        (0.8, P(None, root={"loc": (0, 0.03, 0)}, **glide), "inout"),
+    ], lag=lag, layers=[drift(0.8, 3.0)])
+    # Cast: rise and gather (anticipation, arms lag behind the body), a trembling
+    # hold, a fast throw forward on the release and an overshooting recoil.
+    gather = P(None, body={"rot": (-12, 0, 0)}, head={"rot": (-16, 0, 0)}, arm__R={"rot": (164, 0, -20)}, arm__L={"rot": (64, 0, 42)}, root={"loc": (0, 0.14, 0)})
     A(arm, "cast", [
-        (0.0, {"arm.R": {"rot": (10, 0, -10)}}),
-        (0.35, {"body": {"rot": (-10, 0, 0)}, "head": {"rot": (-14, 0, 0)}, "arm.R": {"rot": (160, 0, -20)}, "arm.L": {"rot": (60, 0, 40)}, "root": {"loc": (0, 0.12, 0)}}),
-        (0.5, {"body": {"rot": (-12, 0, 0)}, "head": {"rot": (-16, 0, 0)}, "arm.R": {"rot": (166, 0, -20)}, "arm.L": {"rot": (64, 0, 42)}, "root": {"loc": (0, 0.14, 0)}}),
-        (0.6, {"body": {"rot": (22, 0, 0)}, "head": {"rot": (8, 0, 0)}, "arm.R": {"rot": (70, 0, -6)}, "arm.L": {"rot": (-10, 0, 20)}}),
-        (0.95, {"arm.R": {"rot": (10, 0, -10)}}),
-    ])
-    A(arm, "hit", [(0.0, {"body": {"rot": (-20, 0, 8)}, "head": {"rot": (-18, 0, 0)}, "root": {"scale": (1.1, 0.9, 1.1)}}), (0.25, {})])
+        (0.0, P(arms_rest)),
+        (0.12, P(None, body={"rot": (6, 0, 0)}, arm__R={"rot": (-10, 0, -16)}, arm__L={"rot": (-8, 0, 16)}, root={"loc": (0, -0.03, 0)}), "out"),
+        (0.36, gather, "out"),
+        (0.52, P(gather, body={"rot": (-14, 0, 0)}, arm__R={"rot": (170, 0, -22)}, root={"loc": (0, 0.16, 0)}), "linear"),
+        (0.6, P(None, body={"rot": (26, 0, 0)}, head={"rot": (10, 0, 0)}, arm__R={"rot": (74, 0, -6)}, arm__L={"rot": (-12, 0, 20)}, root={"loc": (0, 0.04, 0)}), "in"),
+        (0.7, P(None, body={"rot": (30, 0, 0)}, head={"rot": (12, 0, 0)}, arm__R={"rot": (66, 0, -6)}, arm__L={"rot": (-16, 0, 22)}), "out"),
+        (0.95, P(arms_rest), "inout"),
+    ], lag={"head": 0.06, "arm.L": 0.08, "arm.R": 0.03},
+       layers=[lambda t, pose: M.add_rot(pose, "arm.R", 0, 0, 3.0 * math.sin(t * 80.0)) if 0.36 < t < 0.56 else None])
+    A(arm, "hit", [
+        (0.0, P(arms_rest, body={"rot": (-22, 0, 8)}, head={"rot": (-20, 0, 0)}, root={"scale": (1.12, 0.88, 1.12)})),
+        (0.1, P(arms_rest, body={"rot": (-26, 0, 10)}, head={"rot": (-22, 0, 0)}), "out"),
+        (0.22, P(arms_rest, body={"rot": (8, 0, -3)}, head={"rot": (4, 0, 0)}), "inout"),
+        (0.35, P(arms_rest), "inout"),
+    ], lag=lag)
     A(arm, "death", [
-        (0.0, {}),
-        (0.2, {"body": {"rot": (-25, 0, 20)}, "root": {"loc": (0, 0.2, 0)}}),
-        (0.7, {"body": {"rot": (60, 30, 60)}, "root": {"scale": (0.3, 0.1, 0.3)}}),
-    ])
+        (0.0, P(arms_rest)),
+        (0.2, P(None, body={"rot": (-25, 0, 20)}, head={"rot": (-20, 0, 10)}, arm__L={"rot": (40, 0, 60)}, arm__R={"rot": (40, 0, -60)}, root={"loc": (0, 0.22, 0)}), "out"),
+        (0.7, P(None, body={"rot": (60, 30, 60)}, arm__L={"rot": (90, 0, 80)}, arm__R={"rot": (90, 0, -80)}, root={"scale": (0.3, 0.1, 0.3)}), "in"),
+    ], lag=lag)
     if pv:
         L.preview(pv + "/scribbler.png", target=(0, 0, 0.7), dist=3.2)
     L.export_glb(out + "/scribbler.glb", [arm])
@@ -223,28 +281,53 @@ def build_brute(out, pv):
     parts.append((band, "chest"))
     L.rigid_parts(parts, arm, "WaxBrute")
     A = L.animate
+    SQ = M.squash
     base = {"arm.L": {"rot": (6, 0, 8)}, "arm.R": {"rot": (6, 0, -8)}, "fore.L": {"rot": (20, 0, 0)}, "fore.R": {"rot": (20, 0, 0)}}
+    heavy = {"head": 0.1, "fore.L": 0.08, "fore.R": 0.08, "arm.L": 0.04, "arm.R": 0.04}
+    flame = {"flame": M.Spring(2.6, 0.22, parents=("root", "hips", "chest", "head"))}
     A(arm, "idle", [
         (0.0, P(base)),
-        (1.1, P(base, chest={"rot": (4, 0, 0), "scale": (1.02, 0.98, 1.02)}, head={"rot": (-4, 0, 0)}, arm__L={"rot": (10, 0, 12)}, arm__R={"rot": (10, 0, -12)})),
-        (2.2, P(base)),
-    ])
+        (1.1, P(base, chest={"rot": (4, 0, 0), "scale": SQ(1.035)}, head={"rot": (-5, 0, 0)}, hips={"loc": (0, -0.02, 0)},
+                arm__L={"rot": (10, 0, 13)}, arm__R={"rot": (10, 0, -13)}), "inout"),
+        (2.2, P(base), "inout"),
+    ], lag=heavy, springs=flame)
+    # Stomp: the body drops and squashes on each contact (weight), the hips roll over
+    # the planted leg while the chest counter-twists and the arms swing late.
+    def stomp(side):
+        sx = 1 if side == "L" else -1
+        fwd, back = ("leg__L", "leg__R") if side == "L" else ("leg__R", "leg__L")
+        return P(base, **{fwd: {"rot": (26, 0, 0)}, back: {"rot": (-22, 0, 0)}},
+                 hips={"rot": (0, 10 * sx, 6 * sx)}, chest={"rot": (6, -8 * sx, -3 * sx), "scale": SQ(0.95)},
+                 arm__L={"rot": (-18 * sx, 0, 8)}, arm__R={"rot": (22 * sx, 0, -8)}, root={"loc": (0, -0.05, 0)})
+
+    def passing(side):
+        up = "leg__R" if side == "L" else "leg__L"
+        return P(base, **{up: {"rot": (14, 0, 0)}}, chest={"rot": (2, 0, 0), "scale": SQ(1.03)}, root={"loc": (0, 0.06, 0)})
     A(arm, "move", [
-        (0.0, P(base, hips={"rot": (0, 10, 6)}, leg__L={"rot": (28, 0, 0)}, leg__R={"rot": (-24, 0, 0)}, arm__L={"rot": (-18, 0, 8)}, arm__R={"rot": (24, 0, -8)}, root={"loc": (0, 0, 0)})),
-        (0.25, P(base, hips={"rot": (0, 0, 0)}, leg__L={"rot": (0, 0, 0)}, leg__R={"rot": (8, 0, 0)}, root={"loc": (0, 0.06, 0)})),
-        (0.5, P(base, hips={"rot": (0, -10, -6)}, leg__R={"rot": (28, 0, 0)}, leg__L={"rot": (-24, 0, 0)}, arm__R={"rot": (-18, 0, -8)}, arm__L={"rot": (24, 0, 8)}, root={"loc": (0, 0, 0)})),
-        (0.75, P(base, hips={"rot": (0, 0, 0)}, leg__R={"rot": (0, 0, 0)}, leg__L={"rot": (8, 0, 0)}, root={"loc": (0, 0.06, 0)})),
-        (1.0, P(base, hips={"rot": (0, 10, 6)}, leg__L={"rot": (28, 0, 0)}, leg__R={"rot": (-24, 0, 0)}, arm__L={"rot": (-18, 0, 8)}, arm__R={"rot": (24, 0, -8)}, root={"loc": (0, 0, 0)})),
-    ])
-    windup = P(base, chest={"rot": (-18, 0, 0)}, head={"rot": (-12, 0, 0)}, arm__L={"rot": (165, 0, 20)}, arm__R={"rot": (165, 0, -20)}, fore__L={"rot": (30, 0, 0)}, fore__R={"rot": (30, 0, 0)}, root={"loc": (0, 0.1, 0)})
-    slam = P(base, chest={"rot": (38, 0, 0)}, head={"rot": (-20, 0, 0)}, arm__L={"rot": (70, 0, 20)}, arm__R={"rot": (70, 0, -20)}, fore__L={"rot": (10, 0, 0)}, fore__R={"rot": (10, 0, 0)}, hips={"loc": (0, -0.12, 0)}, leg__L={"rot": (20, 0, 8)}, leg__R={"rot": (20, 0, -8)})
-    A(arm, "slam", [(0.0, P(base)), (0.55, windup), (0.7, windup), (0.8, slam), (1.1, slam), (1.45, P(base))])
-    A(arm, "hit", [(0.0, P(base, chest={"rot": (-10, 0, 6)}, head={"rot": (-10, 0, 0)})), (0.3, P(base))])
+        (0.0, stomp("L")), (0.25, passing("L"), "out"), (0.5, stomp("R"), "in"), (0.75, passing("R"), "out"), (1.0, stomp("L"), "in"),
+    ], lag=heavy, springs=flame)
+    crouch = P(base, chest={"rot": (14, 0, 0), "scale": SQ(0.93)}, hips={"loc": (0, -0.08, 0)}, arm__L={"rot": (-24, 0, 14)}, arm__R={"rot": (-24, 0, -14)})
+    windup = P(base, chest={"rot": (-18, 0, 0), "scale": SQ(1.07)}, head={"rot": (-12, 0, 0)}, arm__L={"rot": (165, 0, 20)}, arm__R={"rot": (165, 0, -20)},
+               fore__L={"rot": (30, 0, 0)}, fore__R={"rot": (30, 0, 0)}, root={"loc": (0, 0.1, 0)})
+    hang = P(windup, chest={"rot": (-20, 0, 0), "scale": SQ(1.08)}, arm__L={"rot": (170, 0, 22)}, arm__R={"rot": (170, 0, -22)}, root={"loc": (0, 0.12, 0)})
+    slam = P(base, chest={"rot": (40, 0, 0), "scale": SQ(0.84)}, head={"rot": (-20, 0, 0)}, arm__L={"rot": (70, 0, 20)}, arm__R={"rot": (70, 0, -20)},
+             fore__L={"rot": (8, 0, 0)}, fore__R={"rot": (8, 0, 0)}, hips={"loc": (0, -0.14, 0)}, leg__L={"rot": (22, 0, 8)}, leg__R={"rot": (22, 0, -8)})
+    A(arm, "slam", [
+        (0.0, P(base)), (0.2, crouch, "out"), (0.56, windup, "out"), (0.72, hang, "linear"), (0.8, slam, "in"),
+        (0.9, P(slam, chest={"rot": (34, 0, 0), "scale": SQ(0.94)}, hips={"loc": (0, -0.11, 0)}), "out"),
+        (1.12, P(slam, chest={"rot": (36, 0, 0), "scale": SQ(0.92)}), "inout"), (1.45, P(base), "inout"),
+    ], lag={"head": 0.06, "fore.L": 0.04, "fore.R": 0.04}, springs=flame)
+    A(arm, "hit", [
+        (0.0, P(base, chest={"rot": (-12, 0, 7), "scale": SQ(1.05)}, head={"rot": (-12, 0, 0)})),
+        (0.12, P(base, chest={"rot": (-14, 0, 8)}, head={"rot": (-14, 0, 0)}), "out"),
+        (0.24, P(base, chest={"rot": (5, 0, -2)}), "inout"), (0.36, P(base), "inout"),
+    ], lag=heavy, springs=flame)
     A(arm, "death", [
         (0.0, P(base)),
-        (0.3, P(base, chest={"rot": (10, 0, 10)}, head={"rot": (20, 0, 10)})),
-        (1.1, P(base, root={"scale": (1.5, 0.18, 1.5)}, chest={"rot": (15, 0, 5)})),
-    ])
+        (0.3, P(base, chest={"rot": (-10, 0, 12)}, head={"rot": (-20, 0, 10)}, arm__L={"rot": (30, 0, 40)}), "out"),
+        (0.6, P(base, chest={"rot": (20, 0, 8)}, head={"rot": (26, 0, 10)}, hips={"loc": (0, -0.2, 0)}, leg__L={"rot": (50, 0, 10)}, leg__R={"rot": (40, 0, -10)}), "in"),
+        (1.1, P(base, root={"scale": (1.5, 0.18, 1.5)}, chest={"rot": (15, 0, 5)}), "out"),
+    ], lag=heavy, springs=flame)
     if pv:
         L.preview(pv + "/brute.png", target=(0, 0, 0.9), dist=5.0)
     L.export_glb(out + "/brute.glb", [arm])
@@ -291,24 +374,49 @@ def build_moth(out, pv):
 
     def flap(up):
         return {"wing.L1": {"rot": (0, 0, up)}, "wing.L2": {"rot": (0, 0, up * 0.8)}, "wing.R1": {"rot": (0, 0, -up)}, "wing.R2": {"rot": (0, 0, -up * 0.8)}}
+    # Hind wings trail the fore wings (overlap); downstroke fast, upstroke slow
+    # (timing) and the body rises just after each downstroke.
+    trail = {"wing.L2": 0.035, "wing.R2": 0.035}
     A(arm, "idle", [
-        (0.0, P(flap(45), root={"loc": (0, 0.0, 0)})),
-        (0.15, P(flap(-35), root={"loc": (0, 0.06, 0)})),
-        (0.3, P(flap(45), root={"loc": (0, 0.0, 0)})),
-    ])
+        (0.0, P(flap(48), root={"loc": (0, 0.0, 0)})),
+        (0.1, P(flap(-40), root={"loc": (0, 0.02, 0)}, body={"rot": (-4, 0, 0)}), "in"),
+        (0.18, P(flap(-20), root={"loc": (0, 0.07, 0)}), "out"),
+        (0.3, P(flap(48), root={"loc": (0, 0.0, 0)}), "inout"),
+    ], lag=trail)
     A(arm, "move", [
-        (0.0, P(flap(50), body={"rot": (-10, 0, 0)})),
-        (0.12, P(flap(-40), body={"rot": (-12, 0, 0)}, root={"loc": (0, 0.05, 0)})),
-        (0.24, P(flap(50), body={"rot": (-10, 0, 0)})),
-    ])
-    dive = P(flap(-70), body={"rot": (-30, 0, 0)})
-    A(arm, "attack", [(0.0, P(flap(60))), (0.2, dive), (0.6, dive), (0.8, P(flap(40)))])
-    A(arm, "hit", [(0.0, P(flap(10), body={"rot": (20, 0, 20)})), (0.2, P(flap(40)))])
+        (0.0, P(flap(52), body={"rot": (-10, 0, 0)})),
+        (0.08, P(flap(-44), body={"rot": (-14, 0, 0)}, root={"loc": (0, 0.02, 0)}), "in"),
+        (0.14, P(flap(-24), body={"rot": (-12, 0, 0)}, root={"loc": (0, 0.06, 0)}), "out"),
+        (0.24, P(flap(52), body={"rot": (-10, 0, 0)}), "inout"),
+    ], lag=trail)
+    # Dive (AI: 0.7 s windup, 0.62 s dive): rear back flapping frantically, then snap
+    # into a swept-back dart stretched along the body and hold it through the dive.
+    def frantic(t, pose):
+        if t < 0.66:
+            k = 38 * math.sin(t * 2 * math.pi * 9.0)
+            for b, sgn in (("wing.L1", 1), ("wing.L2", 0.8), ("wing.R1", -1), ("wing.R2", -0.8)):
+                M.add_rot(pose, b, 0, 0, k * sgn)
+        elif t > 0.74:
+            k = 6 * math.sin(t * 2 * math.pi * 14.0)
+            for b in ("wing.L1", "wing.L2", "wing.R1", "wing.R2"):
+                M.add_rot(pose, b, 0, 0, k)
+    rear = P(flap(20), body={"rot": (22, 0, 0)}, root={"loc": (0, 0.14, 0)})
+    dart = P({"wing.L1": {"rot": (-58, 0, -12)}, "wing.L2": {"rot": (-66, 0, -10)}, "wing.R1": {"rot": (-58, 0, 12)}, "wing.R2": {"rot": (-66, 0, 10)}},
+             body={"rot": (-26, 0, 0), "scale": (0.88, 1.28, 0.88)}, root={"loc": (0, -0.1, 0)})
+    A(arm, "attack", [
+        (0.0, P(flap(40))), (0.3, rear, "out"), (0.64, P(rear, body={"rot": (26, 0, 0)}, root={"loc": (0, 0.18, 0)}), "inout"),
+        (0.7, dart, "snap"), (1.25, P(dart, body={"rot": (-22, 0, 0), "scale": (0.92, 1.2, 0.92)}), "linear"), (1.35, P(flap(30)), "out"),
+    ], layers=[frantic])
+    A(arm, "hit", [
+        (0.0, P(flap(10), body={"rot": (24, 0, 26)})), (0.1, P(flap(-30), body={"rot": (-8, 0, -10)}), "out"),
+        (0.24, P(flap(40)), "inout"),
+    ], lag=trail)
     A(arm, "death", [
         (0.0, P(flap(30))),
-        (0.3, P(flap(80), body={"rot": (40, 20, 60)}, root={"loc": (0, -0.4, 0)})),
-        (0.6, P(flap(85), body={"rot": (0, 0, 90)}, root={"loc": (0, -1.05, 0)})),
-    ])
+        (0.3, P(flap(80), body={"rot": (40, 20, 60)}, root={"loc": (0, -0.4, 0)}), "in"),
+        (0.6, P(flap(85), body={"rot": (0, 0, 90)}, root={"loc": (0, -1.05, 0)}), "in"),
+        (0.7, P(flap(60), body={"rot": (0, 0, 90), "scale": (1.2, 0.8, 1.2)}, root={"loc": (0, -1.05, 0)}), "out"),
+    ], lag=trail)
     if pv:
         L.preview(pv + "/moth.png", target=(0, 0, 1.1), dist=2.6, elevation=35)
     L.export_glb(out + "/moth.glb", [arm])
@@ -341,15 +449,31 @@ def build_inkpot(out, pv):
     parts.append((vane, "quill"))
     L.rigid_parts(parts, arm, "Inkpot")
     A = L.animate
-    A(arm, "idle", [(0.0, {"pot": {}}), (0.8, {"pot": {"scale": (1.03, 0.96, 1.03)}, "quill": {"rot": (4, 0, 3)}}), (1.6, {"pot": {}})])
+    SQ = M.squash
+    quill = {"quill": M.Spring(3.0, 0.2, parents=("root", "pot"))}
+    A(arm, "idle", [
+        (0.0, {"pot": {}}),
+        (0.8, {"pot": {"scale": SQ(0.95)}, "quill": {"rot": (4, 0, 3)}}, "inout"),
+        (1.6, {"pot": {}}, "inout"),
+    ], springs=quill)
+    # Lob: squash down (anticipation) -> pop (the shot leaves at 0.3 s) -> recoil.
     A(arm, "attack", [
         (0.0, {"pot": {}}),
-        (0.35, {"pot": {"scale": (1.18, 0.8, 1.18)}, "quill": {"rot": (-14, 0, 0)}}),
-        (0.45, {"pot": {"scale": (0.86, 1.25, 0.86)}, "quill": {"rot": (20, 0, 0)}}),
-        (0.7, {"pot": {}}),
+        (0.22, {"pot": {"scale": SQ(0.74), "rot": (-6, 0, 0)}, "quill": {"rot": (-16, 0, 0)}}, "out"),
+        (0.3, {"pot": {"scale": SQ(1.3), "rot": (4, 0, 0), "loc": (0, 0.05, 0)}, "quill": {"rot": (24, 0, 0)}}, "snap"),
+        (0.42, {"pot": {"scale": SQ(0.88), "rot": (-3, 0, 0)}}, "in"),
+        (0.55, {"pot": {"scale": SQ(1.06)}}, "out"),
+        (0.7, {"pot": {}}, "inout"),
+    ], springs=quill)
+    A(arm, "hit", [
+        (0.0, {"pot": {"scale": SQ(0.72), "rot": (-10, 0, 6)}}),
+        (0.08, {"pot": {"scale": SQ(1.15)}}, "out"), (0.18, {"pot": {"scale": SQ(0.95)}}, "inout"), (0.28, {"pot": {}}, "inout"),
+    ], springs=quill)
+    A(arm, "death", [
+        (0.0, {"pot": {}}), (0.12, {"pot": {"scale": SQ(1.25)}}, "out"),
+        (0.4, {"pot": {"scale": (1.4, 0.3, 1.4), "rot": (0, 0, 20)}, "quill": {"rot": (60, 0, 30)}}, "in"),
+        (0.5, {"pot": {"scale": (1.45, 0.26, 1.45), "rot": (0, 0, 22)}, "quill": {"rot": (70, 0, 34)}}, "out"),
     ])
-    A(arm, "hit", [(0.0, {"pot": {"scale": (1.2, 0.82, 1.2)}}), (0.2, {"pot": {}})])
-    A(arm, "death", [(0.0, {"pot": {}}), (0.15, {"pot": {"scale": (1.3, 0.8, 1.3)}}), (0.5, {"pot": {"scale": (1.4, 0.3, 1.4), "rot": (0, 0, 20)}, "quill": {"rot": (60, 0, 30)}})])
     if pv:
         L.preview(pv + "/inkpot.png", target=(0, 0, 0.5), dist=2.6)
     L.export_glb(out + "/inkpot.glb", [arm])
@@ -425,56 +549,103 @@ def build_binder(out, pv):
         tome("shin" + side, (0.6, 0.7, 0.4), (0.49 * sx, -0.03, 0.22), (0, 0, -5 * sx), m["cover"], "shin." + side)
     L.rigid_parts(parts, arm, "Binder")
     A = L.animate
+    SQ = M.squash
     base = {"arm.L": {"rot": (4, 0, 6)}, "arm.R": {"rot": (4, 0, -6)}, "fore.L": {"rot": (14, 0, 0)}, "fore.R": {"rot": (14, 0, 0)}}
+    lag = {"head": 0.1, "arm.L": 0.03, "arm.R": 0.03, "fore.L": 0.07, "fore.R": 0.07, "hand.L": 0.11, "hand.R": 0.11}
+
+    def shake(t0, t1, amp, bone="head", freq=22.0):
+        def fn(t, pose):
+            if t0 <= t <= t1:
+                env = math.sin(math.pi * (t - t0) / (t1 - t0))
+                M.add_rot(pose, bone, amp * env * math.sin(t * freq * 2 * math.pi), 0, amp * 0.7 * env * math.sin(t * freq * 1.7 * 2 * math.pi))
+        return fn
+
+    def sway(period):
+        def fn(t, pose):
+            w = 2 * math.pi * t / period
+            M.add_rot(pose, "spine", 0, 3 * math.sin(w), 1.5 * math.sin(w + 0.6))
+            M.add_rot(pose, "chest", 0, -2 * math.sin(w + 0.5), 0)
+        return fn
     A(arm, "idle", [
         (0.0, P(base)),
-        (1.4, P(base, chest={"rot": (4, 0, 0)}, head={"rot": (-6, 0, 3)}, spine={"rot": (0, 3, 0)}, arm__L={"rot": (8, 0, 9)}, arm__R={"rot": (8, 0, -9)})),
-        (2.8, P(base)),
-    ])
+        (1.4, P(base, chest={"rot": (4, 0, 0), "scale": SQ(1.03)}, head={"rot": (-6, 0, 3)}, hips={"loc": (0, -0.04, 0)},
+                arm__L={"rot": (8, 0, 9)}, arm__R={"rot": (8, 0, -9)}), "inout"),
+        (2.8, P(base), "inout"),
+    ], lag=lag, layers=[sway(2.8)])
+
+    def step(side):
+        sx = 1 if side == "L" else -1
+        fwd, back = ("L", "R") if side == "L" else ("R", "L")
+        return P(base, **{"leg__" + fwd: {"rot": (26, 0, 0)}, "shin__" + fwd: {"rot": (-10, 0, 0)},
+                          "leg__" + back: {"rot": (-22, 0, 0)}, "shin__" + back: {"rot": (-30, 0, 0)}},
+                 hips={"rot": (0, 8 * sx, 4 * sx), "loc": (0, -0.08, 0)}, chest={"rot": (4, -6 * sx, 0), "scale": SQ(0.96)},
+                 arm__L={"rot": (-14 * sx, 0, 6)}, arm__R={"rot": (20 * sx, 0, -6)})
+
+    def passing(side):
+        lift = "R" if side == "L" else "L"
+        return P(base, root={"loc": (0, 0.1, 0)}, **{"leg__" + lift: {"rot": (12, 0, 0)}, "shin__" + lift: {"rot": (-44, 0, 0)}},
+                 chest={"rot": (0, 0, 0), "scale": SQ(1.02)})
     A(arm, "move", [
-        (0.0, P(base, leg__L={"rot": (26, 0, 0)}, shin__L={"rot": (-10, 0, 0)}, leg__R={"rot": (-22, 0, 0)}, shin__R={"rot": (-30, 0, 0)}, hips={"rot": (0, 8, 4)}, arm__L={"rot": (-14, 0, 6)}, arm__R={"rot": (20, 0, -6)})),
-        (0.35, P(base, root={"loc": (0, 0.08, 0)}, leg__L={"rot": (0, 0, 0)}, leg__R={"rot": (10, 0, 0)}, shin__R={"rot": (-40, 0, 0)})),
-        (0.7, P(base, leg__R={"rot": (26, 0, 0)}, shin__R={"rot": (-10, 0, 0)}, leg__L={"rot": (-22, 0, 0)}, shin__L={"rot": (-30, 0, 0)}, hips={"rot": (0, -8, -4)}, arm__R={"rot": (-14, 0, -6)}, arm__L={"rot": (20, 0, 6)})),
-        (1.05, P(base, root={"loc": (0, 0.08, 0)}, leg__R={"rot": (0, 0, 0)}, leg__L={"rot": (10, 0, 0)}, shin__L={"rot": (-40, 0, 0)})),
-        (1.4, P(base, leg__L={"rot": (26, 0, 0)}, shin__L={"rot": (-10, 0, 0)}, leg__R={"rot": (-22, 0, 0)}, shin__R={"rot": (-30, 0, 0)}, hips={"rot": (0, 8, 4)}, arm__L={"rot": (-14, 0, 6)}, arm__R={"rot": (20, 0, -6)})),
-    ])
-    up = P(base, chest={"rot": (-16, 0, 0)}, head={"rot": (-14, 0, 0)}, arm__L={"rot": (170, 0, 16)}, arm__R={"rot": (170, 0, -16)}, fore__L={"rot": (20, 0, 0)}, fore__R={"rot": (20, 0, 0)})
-    down = P(base, chest={"rot": (36, 0, 0)}, spine={"rot": (10, 0, 0)}, head={"rot": (-24, 0, 0)}, arm__L={"rot": (62, 0, 14)}, arm__R={"rot": (62, 0, -14)}, fore__L={"rot": (6, 0, 0)}, fore__R={"rot": (6, 0, 0)}, hips={"loc": (0, -0.16, 0)}, leg__L={"rot": (22, 0, 6)}, shin__L={"rot": (-30, 0, 0)}, leg__R={"rot": (22, 0, -6)}, shin__R={"rot": (-30, 0, 0)})
-    A(arm, "slam", [(0.0, P(base)), (0.6, up), (0.75, up), (0.88, down), (1.2, down), (1.6, P(base))])
+        (0.0, step("L")), (0.35, passing("L"), "out"), (0.7, step("R"), "in"), (1.05, passing("R"), "out"), (1.4, step("L"), "in"),
+    ], lag=lag)
+    dip = P(base, chest={"rot": (16, 0, 0), "scale": SQ(0.94)}, hips={"loc": (0, -0.12, 0)}, arm__L={"rot": (-20, 0, 18)}, arm__R={"rot": (-20, 0, -18)},
+            leg__L={"rot": (14, 0, 4)}, shin__L={"rot": (-22, 0, 0)}, leg__R={"rot": (14, 0, -4)}, shin__R={"rot": (-22, 0, 0)})
+    up = P(base, chest={"rot": (-16, 0, 0), "scale": SQ(1.06)}, head={"rot": (-14, 0, 0)}, arm__L={"rot": (170, 0, 16)}, arm__R={"rot": (170, 0, -16)},
+           fore__L={"rot": (20, 0, 0)}, fore__R={"rot": (20, 0, 0)}, root={"loc": (0, 0.1, 0)})
+    hang = P(up, chest={"rot": (-18, 0, 0), "scale": SQ(1.07)}, arm__L={"rot": (174, 0, 17)}, arm__R={"rot": (174, 0, -17)}, root={"loc": (0, 0.12, 0)})
+    down = P(base, chest={"rot": (36, 0, 0), "scale": SQ(0.88)}, spine={"rot": (10, 0, 0)}, head={"rot": (-24, 0, 0)}, arm__L={"rot": (62, 0, 14)},
+             arm__R={"rot": (62, 0, -14)}, fore__L={"rot": (6, 0, 0)}, fore__R={"rot": (6, 0, 0)}, hips={"loc": (0, -0.16, 0)},
+             leg__L={"rot": (22, 0, 6)}, shin__L={"rot": (-30, 0, 0)}, leg__R={"rot": (22, 0, -6)}, shin__R={"rot": (-30, 0, 0)})
+    A(arm, "slam", [
+        (0.0, P(base)), (0.22, dip, "out"), (0.6, up, "out"), (0.76, hang, "linear"), (0.88, down, "in"),
+        (0.98, P(down, chest={"rot": (31, 0, 0), "scale": SQ(0.95)}, hips={"loc": (0, -0.13, 0)}), "out"),
+        (1.2, P(down, chest={"rot": (33, 0, 0), "scale": SQ(0.93)}), "inout"), (1.6, P(base), "inout"),
+    ], lag={"head": 0.07, "fore.L": 0.04, "fore.R": 0.04, "hand.L": 0.07, "hand.R": 0.07})
+    coil = P(base, spine={"rot": (0, -35, 0)}, chest={"rot": (0, -10, 0)}, arm__R={"rot": (70, 90, -40)}, fore__R={"rot": (10, 0, 0)}, arm__L={"rot": (20, 0, 30)},
+             hips={"loc": (0, -0.08, 0), "rot": (0, -8, 0)})
     A(arm, "sweep", [
-        (0.0, P(base)),
-        (0.5, P(base, spine={"rot": (0, -35, 0)}, arm__R={"rot": (70, 90, -40)}, fore__R={"rot": (10, 0, 0)}, arm__L={"rot": (20, 0, 30)})),
-        (0.65, P(base, spine={"rot": (0, -38, 0)}, arm__R={"rot": (72, 95, -40)}, fore__R={"rot": (8, 0, 0)}, arm__L={"rot": (20, 0, 30)})),
-        (0.85, P(base, spine={"rot": (0, 40, 0)}, arm__R={"rot": (80, -80, -20)}, fore__R={"rot": (4, 0, 0)}, arm__L={"rot": (-10, 0, 24)})),
-        (1.1, P(base, spine={"rot": (0, 36, 0)}, arm__R={"rot": (74, -76, -20)}, fore__R={"rot": (8, 0, 0)})),
-        (1.5, P(base)),
-    ])
+        (0.0, P(base)), (0.5, coil, "out"),
+        (0.64, P(coil, spine={"rot": (0, -40, 0)}, arm__R={"rot": (72, 98, -40)}, fore__R={"rot": (8, 0, 0)}), "inout"),
+        (0.8, P(base, spine={"rot": (0, 42, 0)}, chest={"rot": (0, 12, 0)}, arm__R={"rot": (80, -84, -20)}, fore__R={"rot": (4, 0, 0)}, arm__L={"rot": (-10, 0, 24)},
+                hips={"loc": (0, -0.1, 0), "rot": (0, 10, 0)}), "in"),
+        (0.92, P(base, spine={"rot": (0, 46, 0)}, chest={"rot": (0, 14, 0)}, arm__R={"rot": (78, -92, -20)}, fore__R={"rot": (6, 0, 0)}, hips={"loc": (0, -0.09, 0)}), "out"),
+        (1.15, P(base, spine={"rot": (0, 36, 0)}, arm__R={"rot": (74, -76, -20)}, fore__R={"rot": (8, 0, 0)}), "inout"),
+        (1.5, P(base), "inout"),
+    ], lag={"head": 0.08, "fore.R": 0.03, "hand.R": 0.05, "fore.L": 0.07})
     A(arm, "volley", [
         (0.0, P(base)),
-        (0.4, P(base, chest={"rot": (-12, 0, 0)}, arm__L={"rot": (100, -20, 20)}, arm__R={"rot": (100, 20, -20)}, fore__L={"rot": (30, 0, 0)}, fore__R={"rot": (30, 0, 0)})),
-        (0.55, P(base, chest={"rot": (18, 0, 0)}, arm__L={"rot": (88, 10, 30)}, arm__R={"rot": (88, -10, -30)}, fore__L={"rot": (0, 0, 0)}, fore__R={"rot": (0, 0, 0)})),
-        (1.0, P(base)),
-    ])
+        (0.36, P(base, chest={"rot": (-14, 0, 0), "scale": SQ(1.05)}, arm__L={"rot": (100, -24, 20)}, arm__R={"rot": (100, 24, -20)}, fore__L={"rot": (34, 0, 0)}, fore__R={"rot": (34, 0, 0)}), "out"),
+        (0.45, P(base, chest={"rot": (-16, 0, 0), "scale": SQ(1.06)}, arm__L={"rot": (104, -26, 20)}, arm__R={"rot": (104, 26, -20)}, fore__L={"rot": (38, 0, 0)}, fore__R={"rot": (38, 0, 0)}), "linear"),
+        (0.52, P(base, chest={"rot": (20, 0, 0), "scale": SQ(0.94)}, arm__L={"rot": (88, 12, 30)}, arm__R={"rot": (88, -12, -30)}, fore__L={"rot": (0, 0, 0)}, fore__R={"rot": (0, 0, 0)}), "snap"),
+        (0.66, P(base, chest={"rot": (14, 0, 0)}, arm__L={"rot": (82, 8, 28)}, arm__R={"rot": (82, -8, -28)}), "out"),
+        (1.0, P(base), "inout"),
+    ], lag=lag)
+    raised = P(base, chest={"rot": (-20, 0, 0), "scale": SQ(1.05)}, head={"rot": (-25, 0, 0)}, arm__L={"rot": (150, 0, 50)}, arm__R={"rot": (150, 0, -50)})
     A(arm, "summon", [
-        (0.0, P(base)),
-        (0.45, P(base, chest={"rot": (-20, 0, 0)}, head={"rot": (-25, 0, 0)}, arm__L={"rot": (150, 0, 50)}, arm__R={"rot": (150, 0, -50)})),
-        (0.9, P(base, chest={"rot": (-22, 0, 0)}, head={"rot": (-28, 0, 0)}, arm__L={"rot": (155, 0, 55)}, arm__R={"rot": (155, 0, -55)})),
-        (1.3, P(base)),
-    ])
+        (0.0, P(base)), (0.14, P(base, chest={"rot": (12, 0, 0)}, arm__L={"rot": (-10, 0, 20)}, arm__R={"rot": (-10, 0, -20)}), "out"),
+        (0.45, raised, "snap"),
+        (0.9, P(raised, chest={"rot": (-22, 0, 0)}, head={"rot": (-28, 0, 0)}, arm__L={"rot": (155, 0, 55)}, arm__R={"rot": (155, 0, -55)}), "linear"),
+        (1.3, P(base), "inout"),
+    ], lag=lag, layers=[shake(0.45, 0.9, 2.0, "chest", 16.0)])
+    rear = P(base, chest={"rot": (-24, 0, 0), "scale": SQ(1.06)}, head={"rot": (-30, 0, 0)}, arm__L={"rot": (40, 0, 60)}, arm__R={"rot": (40, 0, -60)})
     A(arm, "roar", [
-        (0.0, P(base)),
-        (0.25, P(base, chest={"rot": (-24, 0, 0)}, head={"rot": (-30, 0, 0)}, arm__L={"rot": (40, 0, 60)}, arm__R={"rot": (40, 0, -60)})),
-        (0.5, P(base, chest={"rot": (-26, 0, 4)}, head={"rot": (-32, 0, -4)}, arm__L={"rot": (44, 0, 64)}, arm__R={"rot": (44, 0, -64)})),
-        (0.75, P(base, chest={"rot": (-24, 0, -4)}, head={"rot": (-30, 0, 4)}, arm__L={"rot": (40, 0, 60)}, arm__R={"rot": (40, 0, -60)})),
-        (1.1, P(base)),
-    ])
-    A(arm, "hit", [(0.0, P(base, chest={"rot": (-10, 0, 5)}, head={"rot": (-12, 0, 0)})), (0.3, P(base))])
+        (0.0, P(base)), (0.12, P(base, chest={"rot": (14, 0, 0)}, head={"rot": (12, 0, 0)}, hips={"loc": (0, -0.08, 0)}), "out"),
+        (0.28, rear, "snap"), (0.8, P(rear, chest={"rot": (-26, 0, 0)}, head={"rot": (-32, 0, 0)}), "linear"), (1.1, P(base), "inout"),
+    ], lag=lag, layers=[shake(0.28, 0.85, 4.0, "head", 20.0), shake(0.28, 0.85, 1.5, "chest", 13.0)])
+    A(arm, "hit", [
+        (0.0, P(base, chest={"rot": (-12, 0, 6)}, head={"rot": (-14, 0, 0)})), (0.1, P(base, chest={"rot": (-14, 0, 7)}), "out"),
+        (0.22, P(base, chest={"rot": (5, 0, -2)}), "inout"), (0.34, P(base), "inout"),
+    ], lag=lag)
     A(arm, "death", [
         (0.0, P(base)),
-        (0.4, P(base, chest={"rot": (-20, 0, 10)}, head={"rot": (-30, 0, 10)}, arm__L={"rot": (60, 0, 60)}, arm__R={"rot": (60, 0, -60)})),
-        (1.2, P(base, root={"loc": (0, -0.6, 0), "rot": (25, 0, 8)}, chest={"rot": (30, 0, 12)}, head={"rot": (40, 0, 20)}, arm__L={"rot": (10, 0, 30)}, arm__R={"rot": (10, 0, -30)}, leg__L={"rot": (70, 0, 0)}, shin__L={"rot": (-90, 0, 0)}, leg__R={"rot": (60, 0, 0)}, shin__R={"rot": (-80, 0, 0)})),
-        (2.0, P(base, root={"loc": (0, -0.7, 0), "rot": (80, 0, 8)}, chest={"rot": (20, 0, 12)}, head={"rot": (30, 0, 20)}, arm__L={"rot": (100, 0, 40)}, arm__R={"rot": (100, 0, -40)}, leg__L={"rot": (20, 0, 0)}, leg__R={"rot": (20, 0, 0)})),
-    ])
+        (0.4, P(base, chest={"rot": (-20, 0, 10)}, head={"rot": (-30, 0, 10)}, arm__L={"rot": (60, 0, 60)}, arm__R={"rot": (60, 0, -60)}), "out"),
+        (1.2, P(base, root={"loc": (0, -0.6, 0), "rot": (25, 0, 8)}, chest={"rot": (30, 0, 12)}, head={"rot": (40, 0, 20)}, arm__L={"rot": (10, 0, 30)}, arm__R={"rot": (10, 0, -30)},
+                leg__L={"rot": (70, 0, 0)}, shin__L={"rot": (-90, 0, 0)}, leg__R={"rot": (60, 0, 0)}, shin__R={"rot": (-80, 0, 0)}), "in"),
+        (1.75, P(base, root={"loc": (0, -0.7, 0), "rot": (84, 0, 8)}, chest={"rot": (20, 0, 12)}, head={"rot": (30, 0, 20)}, arm__L={"rot": (100, 0, 40)}, arm__R={"rot": (100, 0, -40)},
+                 leg__L={"rot": (20, 0, 0)}, leg__R={"rot": (20, 0, 0)}), "in"),
+        (2.0, P(base, root={"loc": (0, -0.7, 0), "rot": (80, 0, 8)}, chest={"rot": (20, 0, 12)}, head={"rot": (30, 0, 20)}, arm__L={"rot": (100, 0, 40)}, arm__R={"rot": (100, 0, -40)},
+                leg__L={"rot": (20, 0, 0)}, leg__R={"rot": (20, 0, 0)}), "out"),
+    ], lag=lag)
     if pv:
         L.preview(pv + "/binder.png", target=(0, 0, 1.6), dist=8.0)
     L.export_glb(out + "/binder.glb", [arm])

@@ -38,6 +38,7 @@ var facing := Vector3(0, 0, 1)
 var aim_dir := Vector3(0, 0, 1)
 var aim_point := Vector3.ZERO
 var move_vel := Vector3.ZERO
+var _rig: ProceduralRig
 var cooldowns: Array[float] = [0.0, 0.0, 0.0]
 var cooldown_max: Array[float] = [1.0, 1.0, 1.0]
 var dash_charges := 2
@@ -127,6 +128,8 @@ func _build_visuals() -> void:
 			_anim.get_animation(loop_name).loop_mode = Animation.LOOP_LINEAR if loop_name != "dash" else Animation.LOOP_NONE
 	var skel := Toon.find_skeleton(_model)
 	if skel:
+		_rig = ProceduralRig.new()
+		skel.add_child(_rig)
 		var att := BoneAttachment3D.new()
 		att.bone_name = "flame"
 		skel.add_child(att)
@@ -317,6 +320,11 @@ func _move(delta: float) -> void:
 		want_face = Combat.flat(move_vel).normalized()
 	facing = facing.slerp(want_face, 1.0 - exp(-delta * 18.0)).normalized()
 	pivot.rotation.y = atan2(facing.x, facing.z)
+	if _rig:
+		_rig.velocity = Combat.flat(velocity)
+		_rig.facing_yaw = pivot.rotation.y
+		_rig.want_yaw = atan2(want_face.x, want_face.z)
+		_rig.amount = 0.0 if downed else 1.0
 	if _anim_lock <= 0.0 and _dash_timer <= 0.0:
 		if moving:
 			_play("run", 0.12, clampf(move_vel.length() / MOVE_SPEED, 0.6, 1.3))
