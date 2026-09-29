@@ -139,6 +139,12 @@ func music(id: String) -> void:
 	_music_calm.stream = load(calm_path) if ResourceLoader.exists(calm_path) else null
 	_music_combat.stream = load(combat_path) if ResourceLoader.exists(combat_path) else null
 	for m in [_music_calm, _music_combat]:
+		if m.stream is AudioStreamOggVorbis:
+			(m.stream as AudioStreamOggVorbis).loop = true
+		elif m.stream is AudioStreamWAV:
+			(m.stream as AudioStreamWAV).loop_mode = AudioStreamWAV.LOOP_FORWARD
+	# Stems start on the same frame so calm and combat stay locked together.
+	for m in [_music_calm, _music_combat]:
 		if m.stream:
 			m.play()
 		else:
